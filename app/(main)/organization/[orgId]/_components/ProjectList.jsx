@@ -33,8 +33,10 @@ const ProjectList = async ({ orgId }) => {
                     </CardHeader>
                     <CardContent className='text-lg text-muted-foreground flex justify-between gap-2'>
                         {project.description}
-                        <Button type='button' variant='secondary' className='text-orange-400 hover:underline hover:text-primary'>
-                            Visit Project
+                        <Button asChild type='button' variant='secondary' className='text-orange-400 hover:underline hover:text-primary'>
+                            <Link href={`/project/${project.id}`}>
+                                Visit Project
+                            </Link>
                         </Button>
                     </CardContent>
                 </Card>

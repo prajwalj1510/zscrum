@@ -105,3 +105,44 @@ export const deleteProject = async (projectId) => {
 
     return { success: true }
 }
+
+export const getProject = async (projectId) => {
+    const { userId, orgId } = await auth()
+
+    if(!userId || !orgId) {
+        throw new Error('Unauthorized')
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {
+            clerkUserId: userId,
+        }
+    })
+
+    if(!user) {
+        throw new Error('User not found')
+    }
+
+    const project = await prisma.project.findUnique({
+        where: {
+            id: projectId,
+        },
+        include: {
+            sprints : {
+                orderBy: {
+                    createdAt: 'desc',
+                }
+            }
+        }
+    })
+
+    if(!project) {
+        throw new Error('Project not found!')
+    }
+
+    if(project.organizationId !== orgId) {
+        return null;
+    }
+
+    return project
+}
