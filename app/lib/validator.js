@@ -11,3 +11,10 @@ export const sprintSchema = z.object({
     startDate: z.date(),
     endDate: z.date(),
 })
+
+export const issueSchema = z.object({
+    title: z.string().min(1, 'Title is required'),
+    assigneeId: z.string().min(1, "Assignee is Required"),
+    description: z.string().optional(),
+    prioity: z.enum(["LOW","MEDIUM","HIGH","URGENT"])
+})
