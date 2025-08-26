@@ -5,3 +5,9 @@ export const projectSchema = z.object({
     key: z.string().min(2, "Key must be atleast 2 charavters long...").max(50, "Key must be atmost 50 characters"),
     description: z.string().max(500, "Description must be less than 500 characters").optional()
 })
+
+export const sprintSchema = z.object({
+    name: z.string().min(1, "Sprint name is required"),
+    startDate: z.date(),
+    endDate: z.date(),
+})
