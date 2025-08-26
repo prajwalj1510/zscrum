@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { BadgeAlert, Loader } from 'lucide-react'
 import useFetch from '@/hooks/use-fetch'
 import { updateSprintStatus } from '@/actions/sprints'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const SprintManager = ({ sprint, setCurrentSprint, sprints, projectId }) => {
 
@@ -21,6 +22,8 @@ const SprintManager = ({ sprint, setCurrentSprint, sprints, projectId }) => {
     const startDate = new Date(sprint.startDate)
     const endDate = new Date(sprint.endDate)
     const now = new Date()
+    const searchParams = useSearchParams()
+    const router = useRouter()
 
     const canStart = isBefore(now, endDate) && isAfter(now, startDate) && status === 'PLANNED'
 
@@ -42,10 +45,22 @@ const SprintManager = ({ sprint, setCurrentSprint, sprints, projectId }) => {
         }
     },[updatedStatus, loading])
 
+    useEffect(()=>{
+        const sprintId = searchParams.get('sprint')
+        if(sprintId && sprintId !== sprint.id) {
+            const selectedSprint = sprints.find((s) => s.id === sprintId)
+            if(selectedSprint) {
+                setCurrentSprint(selectedSprint)
+                setStatus(selectedSprint.status)
+            }
+        }
+    },[searchParams, sprints])
+
     const handleSprintChange = (value) => {
         const selectedSprint = sprints.find((sprint) => sprint.id === value)
         setCurrentSprint(selectedSprint)
         setStatus(selectedSprint.status)
+        router.replace(`/project/${projectId}`, undefined, {shallow: true})
     }
 
     const getSprintStatus = () => {

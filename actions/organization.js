@@ -20,11 +20,11 @@ export const GetOrganization = async (slug) => {
     }
 
     const organization = await (await clerkClient()).organizations.getOrganization({
-        slug:slug,
+        slug: slug,
     })
 
     // console.log(organization);
-    
+
 
     if (!organization) {
         return null;
@@ -35,15 +35,49 @@ export const GetOrganization = async (slug) => {
     })
 
     // console.log(membership);
-    
+
 
     const userMembership = membership?.find(
-        (member) => member.publicUserData.userId === userId 
+        (member) => member.publicUserData.userId === userId
     )
 
-    if(!userMembership) {
+    if (!userMembership) {
         return null;
     }
 
     return organization;
+}
+
+export const GetOrganizationUsers = async (orgId) => {
+    const { userId } = await auth()
+
+    if (!userId) {
+        throw new Error('Unauthorized')
+    }
+
+    const user = await prisma.user.findUnique({
+        where: { clerkUserId: userId },
+    })
+
+    if (!user) {
+        throw new Error('User not found')
+    }
+
+    const { data: membership } = await (await clerkClient()).organizations.getOrganizationMembershipList({
+        organizationId: orgId,
+    })
+
+    const userIds = membership?.map(
+        (member) => member.publicUserData.userId
+    )
+
+    const users = await prisma.user.findMany({
+        where: {
+            clerkUserId : {
+                in: userIds,
+            }
+        }
+    })
+
+    return users
 }
